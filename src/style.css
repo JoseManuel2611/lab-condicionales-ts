@@ -19,6 +19,12 @@
   margin: 1rem 0;
 }
 
+#seguir {
+  display: none;
+  margin: 1rem auto;
+  background: purple;
+}
+
 #puntuacion {
   font-size: 2rem;
 }
@@ -34,7 +40,16 @@
   background-color: #333333;
   border-radius: 15px;
 }
-
+#mensaje.gameOver,
+#mensaje.winner {
+  font-weight: bold;
+}
+#mensaje.gameOver {
+  background: crimson;
+}
+#mensaje.winner {
+  background: green;
+}
 a {
   font-weight: 500;
   color: #646cff;
