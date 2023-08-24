@@ -109,6 +109,13 @@ const comprobarPuntuacion = (puntuacion: number) => {
     return (puntuacion > 7.5) ? "GAME_OVER" : "NUEVA_PARTIDA";
 
 };
+const muestraPuntuacion = () => {
+    if (elementoPuntuacion) {
+        elementoPuntuacion.innerHTML = `Puntos: <span>${puntuacion}</span>`
+    } else {
+        console.error("muestraPuntuacion: no se ha encontrado el elemento con id puntuacion.");
+    }
+};
 
 const bloquearPartida = () => {
     if (botonDameCarta && botonDameCarta instanceof HTMLButtonElement) {
@@ -125,14 +132,6 @@ const bloquearPartida = () => {
         botonSeguir.disabled = true;
     } else {
         console.error("bloquearPartida: no se ha encontrado el elemento con id seguir.");
-    }
-};
-
-const muestraPuntuacion = () => {
-    if (elementoPuntuacion) {
-        elementoPuntuacion.innerHTML = `Puntos: <span>${puntuacion}</span>`
-    } else {
-        console.error("muestraPuntuacion: no se ha encontrado el elemento con id puntuacion.");
     }
 };
 
