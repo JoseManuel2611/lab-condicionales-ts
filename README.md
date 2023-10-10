@@ -17,4 +17,4 @@ Implementación de juego de cartas de las 7 1/2 en modo solitario
     - Handle dame carta
     - Handle me planto
     - Seguir partida
-    - Nueva partida
+    - Nueva partida.
