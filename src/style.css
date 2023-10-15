@@ -25,11 +25,11 @@
   background: purple;
 }
 
-#puntuacion {
+#marcador {
   font-size: 2rem;
 }
 
-#puntuacion span {
+#marcador span {
   font-weight: 800;
 }
 
