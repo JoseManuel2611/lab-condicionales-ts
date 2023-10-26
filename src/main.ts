@@ -1,13 +1,4 @@
-import "./style.css";
-
-const botonDameCarta = document.getElementById("dame_carta");
-const botonMePlanto = document.getElementById("me_planto");
-const botonReanudar = document.getElementById("reanudar");
-const botonSeguir = document.getElementById("seguir");
-
-const cartaPrincipal = document.getElementById("carta");
-const elementoPuntuacion = document.getElementById("puntuacion");
-const elementoMensaje =  document.getElementById("mensaje");
+let puntuacion: number = 0;
 
 type Estado =
     | "CONSERVADOR"
@@ -17,25 +8,12 @@ type Estado =
     | "GAME_OVER"
     | "NUEVA_PARTIDA";
 
+const generaNumeroAleatorio = (): number => Math.floor(Math.random() * 10) + 1;
 
-const generaNumeroAleatorio = () => {
-    let numeroAleatorio: number = 0;
-    numeroAleatorio = Math.floor(Math.random() * 10) + 1;
-    return numeroAleatorio;
-}
+const generaCarta = (cartaRandom: number): number => cartaRandom <= 7 ? cartaRandom : cartaRandom + 2;
 
-const generaCarta = () => {
-    let cartaRandom: number = 0;
-    cartaRandom = generaNumeroAleatorio();
-    if (cartaRandom >= 8) {
-        cartaRandom = cartaRandom + 2;
-    }
-    return cartaRandom;
-
-}
-
-let url = "";
-const urlCarta = (carta: number): void => {
+const urlCarta = (carta: number): string => {
+    let url = "";
     switch (carta) {
         case 1:
             url = "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/copas/1_as-copas.jpg";
@@ -71,74 +49,29 @@ const urlCarta = (carta: number): void => {
             url = "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/back.jpg";
             break;
     }
+  return url;
 };
 
-const muestraCarta = () => {
-    if (cartaPrincipal) {
-        (cartaPrincipal as HTMLImageElement).src = url; 
-    } else {
-        console.error("muestraCarta: no se ha encontrado el elemento con id carta.");
-    }
-}
-
-let puntuacion: number = 0;
-const obtenerPuntuacion = (carta: number) => {
-    if (carta >= 10) {
-        carta = 0.5;
-    }
-    puntuacion = puntuacion + carta;
-}
+const obtenerPuntuacion = (numero: number): number => numero <= 7 ? numero : 0.5;
 
 const comprobarPuntuacion = (puntuacion: number) => {
-
     if (puntuacion <= 4) {
         return "CONSERVADOR";
     }
     if (puntuacion > 4 && puntuacion <= 6) {
         return "MIEDO";
-
     }
     if (puntuacion > 6 && puntuacion <= 7) {
         return "CASI";
-
     }
     if (puntuacion === 7.5) {
         return "CLAVADO";
     }
-
     return (puntuacion > 7.5) ? "GAME_OVER" : "NUEVA_PARTIDA";
-
-};
-const muestraPuntuacion = () => {
-    if (elementoPuntuacion) {
-        elementoPuntuacion.innerHTML = `Puntos: <span>${puntuacion}</span>`
-    } else {
-        console.error("muestraPuntuacion: no se ha encontrado el elemento con id puntuacion.");
-    }
 };
 
-const bloquearPartida = () => {
-    if (botonDameCarta && botonDameCarta instanceof HTMLButtonElement) {
-        botonDameCarta.disabled = true;
-    } else {
-        console.error("bloquearPartida: no se ha encontrado el elemento con id dame_carta.");
-    }
-    if (botonMePlanto && botonMePlanto instanceof HTMLButtonElement) {
-        botonMePlanto.disabled = true;
-    } else {
-        console.error("bloquearPartida: no se ha encontrado el elemento con id me_planto.");
-    }
-    if (botonSeguir && botonSeguir instanceof HTMLButtonElement) {
-        botonSeguir.disabled = true;
-    } else {
-        console.error("bloquearPartida: no se ha encontrado el elemento con id seguir.");
-    }
-};
-
-
-let mensaje : string = "";
 const compruebaMensaje = (estado: Estado) => {
-
+    let mensaje : string = "";
     switch(estado) {
         case "CONSERVADOR":
             mensaje = "Has sido muy conservador";
@@ -159,97 +92,148 @@ const compruebaMensaje = (estado: Estado) => {
             mensaje = "No sé que ha pasado, pero no deberías estar aquí";
             break;
     }
+    return mensaje;
 };
 
-const muestraMensaje = (estado: Estado) => {
-    compruebaMensaje(estado);
-    if (elementoMensaje) {
-        elementoMensaje.innerHTML = mensaje;
+const muestraCarta = (url: string): void => {
+    const cartaPrincipal = document.getElementById("carta");
+    if (cartaPrincipal && cartaPrincipal instanceof HTMLImageElement) {
+        cartaPrincipal.src = url; 
+    } else {
+        console.error("muestraCarta: no se ha encontrado el elemento con id carta.");
+    }
+};
+
+const muestraPuntuacion = () => {
+    const elementoPuntuacion = document.getElementById("puntuacion");
+    if (elementoPuntuacion && elementoPuntuacion instanceof HTMLSpanElement) {
+        elementoPuntuacion.innerText = `${puntuacion}`;
+    } else {
+        console.error("muestraPuntuacion: no se ha encontrado el elemento con id puntuacion.");
+    }
+};
+
+const muestraMensaje = (mensaje: string): void => {
+    const elementoMensaje =  document.getElementById("mensaje");
+    if (elementoMensaje && elementoMensaje instanceof HTMLElement) {
+        elementoMensaje.innerText = mensaje;
+        if (mensaje === "") elementoMensaje.setAttribute("class", "");
+        cambiaClase(elementoMensaje);
+       
     } else {
         console.error("muestraMensaje: no se ha encontrado el elemento con id mensaje.");
     }
 };
 
-const gameOver = (estado: Estado) => {
-    if(estado === "GAME_OVER" || estado === "CLAVADO") {
-        bloquearPartida();
-        muestraMensaje(estado);
+
+
+const cambiaClase = (elemento: Element) => {
+    const estado: Estado = comprobarPuntuacion(puntuacion);
+    if(estado === "GAME_OVER") {
+        elemento.classList.add("gameOver");
+        elemento.classList.remove("winner");
     }
-    if (elementoMensaje) {
-        if(estado === "GAME_OVER") {
-            elementoMensaje.classList.add("gameOver");
-            elementoMensaje.classList.remove("winner");
+    if(estado === "CLAVADO") {
+        elemento.classList.remove("gameOver");
+        elemento.classList.add("winner");
+    }
+
+};
+
+const bloquearPartida = (estado: Estado) => {
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach((button) => { 
+        button.id === "reanudar" || button.id === "seguir" ? button.disabled = false : button.disabled = true;
+        if (button.id === "seguir") button.style.display = "block";
+        if (estado === "GAME_OVER" || estado === "CLAVADO") {
+            if (button.id === "seguir") button.style.display = "none";
         }
-        if(estado === "CLAVADO") {
-            elementoMensaje.classList.remove("gameOver");
-            elementoMensaje.classList.add("winner");
-        }
+    });
+};
+
+const reanudarPartida = () => {
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach((button) => {
+        button.disabled = false;
+        if (button.id === "seguir") button.style.display = "none";
+    });
+};
+
+const finDePartida = (estado: Estado) => {
+    if(estado === "GAME_OVER" || estado === "CLAVADO") {
+        const mensajeFin = compruebaMensaje(estado);
+        muestraMensaje(mensajeFin);
+        bloquearPartida(estado);
     }
 };
 
+const nuevaCarta = () => {
+    
+    // lógica
+    const numeroAleatorio = generaNumeroAleatorio();
+    const obtenPuntuacion = obtenerPuntuacion(numeroAleatorio);
+    puntuacion += obtenPuntuacion;
+    const estado: Estado = comprobarPuntuacion(puntuacion);
+    const valorCarta = generaCarta(numeroAleatorio);
 
-const handleDameCarta = () => {
-    let carta: number = generaCarta();
-    urlCarta(carta);
-    muestraCarta();
-    obtenerPuntuacion(carta);
+    // UI
+    const urlImagen = urlCarta(valorCarta);
+    muestraCarta(urlImagen);
     muestraPuntuacion();
-    const estado: Estado = comprobarPuntuacion(puntuacion);
-    gameOver(estado);
+    finDePartida(estado);
+
 }
 
-const handleMePlanto = () => {
-    bloquearPartida();
+const mePlanto = () => {
     const estado: Estado = comprobarPuntuacion(puntuacion);
-    muestraMensaje(estado);
+    const mensajeMePlanto = compruebaMensaje(estado);
+    muestraMensaje(mensajeMePlanto);
+    bloquearPartida(estado);
 
-    if (botonSeguir && botonSeguir instanceof HTMLButtonElement) {
-        botonSeguir.style.display = 'block';
-        botonSeguir.disabled = false;
-    }
 }
+
 const seguirPartida = () => {
-    let carta: number = generaCarta();
-    urlCarta(carta);
-    muestraCarta();
-    obtenerPuntuacion(carta);
-    muestraPuntuacion();
     const estado: Estado = comprobarPuntuacion(puntuacion);
-    gameOver(estado);
+    nuevaCarta();
+    finDePartida(estado);
 };
 
 const nuevaPartida = () => {
+    puntuacion = 0;
+    const mensaje = "";
+    const cartaBack = "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/back.jpg";
+
+    muestraPuntuacion();
+    muestraMensaje(mensaje);
+    muestraCarta(cartaBack);
+    reanudarPartida();
+
+};
+
+
+const eventos = () => {
+    const botonDameCarta = document.getElementById("dame_carta");
+    const botonMePlanto = document.getElementById("me_planto");
+    const botonReanudar = document.getElementById("reanudar");
+    const botonSeguir = document.getElementById("seguir");
+
     if (botonDameCarta && botonDameCarta instanceof HTMLButtonElement) {
-        puntuacion = 0;
-        botonDameCarta.disabled = false;
+        botonDameCarta.addEventListener("click", nuevaCarta);
     }
     if (botonMePlanto && botonMePlanto instanceof HTMLButtonElement) {
-        puntuacion = 0;
-        botonMePlanto.disabled = false;
-    }
+        botonMePlanto.addEventListener("click", mePlanto);
+    };
+    if (botonReanudar && botonReanudar instanceof HTMLButtonElement) {
+        botonReanudar.addEventListener("click", nuevaPartida);
+    };
     if (botonSeguir && botonSeguir instanceof HTMLButtonElement) {
-        botonSeguir.style.display = 'none';
-    }
-    if (elementoMensaje) {
-        elementoMensaje.innerHTML = "";
-        elementoMensaje.classList.remove("gameOver", "winner");
-    }
-    (cartaPrincipal as HTMLImageElement).src = "https://raw.githubusercontent.com/Lemoncode/fotos-ejemplos/main/cartas/back.jpg";
-    
-    muestraPuntuacion();
-};
-
-if (botonDameCarta && botonDameCarta instanceof HTMLButtonElement) {
-    botonDameCarta.addEventListener("click", handleDameCarta);
+        botonSeguir.addEventListener("click", seguirPartida);
+    };
 }
-if (botonMePlanto && botonMePlanto instanceof HTMLButtonElement) {
-    botonMePlanto.addEventListener("click", handleMePlanto);
-};
 
-if (botonReanudar && botonReanudar instanceof HTMLButtonElement) {
-    botonReanudar.addEventListener("click", nuevaPartida);
-};
 
-if (botonSeguir && botonSeguir instanceof HTMLButtonElement) {
-    botonSeguir.addEventListener("click", seguirPartida);
-};
+document.addEventListener("DOMContentLoaded", () => {
+    muestraPuntuacion();
+    eventos();
+});
+
